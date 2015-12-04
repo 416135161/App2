@@ -171,6 +171,6 @@ public class MainActivity extends Activity {
 		TopBar topBar = (TopBar)findViewById(R.id.topBar);
 		topBar.hiddenLeftButton(true);
 		topBar.hiddenRightButton(true);
-		topBar.setTitle("实刻订");
+		topBar.setTitle("甩手掌柜");
 	}
 }

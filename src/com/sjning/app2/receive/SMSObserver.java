@@ -1,13 +1,12 @@
 package com.sjning.app2.receive;
 
-import com.sjning.app2.tools.UserSession;
-
 import android.content.ContentResolver;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
+
+import com.sjning.app2.tools.UserSession;
 
 public class SMSObserver extends ContentObserver {
 	public static final String TAG = "SMSObserver";
