@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
+import android.os.Environment;
 import android.widget.Toast;
 
 
@@ -52,5 +53,23 @@ public class NormalUtil {
 	public static void displayMessage(Context context, String message) {
 		Toast.makeText(context.getApplicationContext(), message,
 				Toast.LENGTH_SHORT).show();
+	}
+	
+	
+	public static String getRootDir() {
+		if (isHasSdcard()) {
+			return Environment.getExternalStorageDirectory().getAbsolutePath()
+					+ "/YLT_sszg/";
+		} else {
+			return Environment.getDataDirectory().getAbsolutePath() + "/";
+		}
+	}
+	private static boolean isHasSdcard() {
+		String status = Environment.getExternalStorageState();
+		if (status.equals(Environment.MEDIA_MOUNTED)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

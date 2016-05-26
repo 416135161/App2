@@ -23,6 +23,8 @@ import com.sjning.app2.db.DBTool;
 import com.sjning.app2.receive.BootService;
 import com.sjning.app2.receive.MessageItem;
 import com.sjning.app2.tools.FileUtils;
+import com.sjning.app2.tools.NormalUtil;
+import com.sjning.app2.tools.UserSession;
 import com.sjning.app2.ui.TopBar;
 
 public class MainActivity extends Activity implements OnClickListener {
@@ -133,6 +135,10 @@ public class MainActivity extends Activity implements OnClickListener {
 			return 0;
 		}
 
+		public String getOutPutMessage() {
+			return null;
+		}
+
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			// TODO Auto-generated method stub
@@ -184,7 +190,16 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		switch (v.getId()) {
 		case R.id.btn_send:
-			FileUtils.saveToSDCardOrRAM(this, filename, content, filePath);
+			try {
+				String fileName = UserSession.getDataStrFromTimeMillis(
+						System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss")
+						+ ".txt";
+				FileUtils.saveToSDCardOrRAM(this, fileName,
+						adapter.getOutPutMessage(), NormalUtil.getRootDir());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			break;
 
 		}
