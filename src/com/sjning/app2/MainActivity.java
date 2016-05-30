@@ -136,7 +136,14 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 
 		public String getOutPutMessage() {
-			return null;
+			String temp = "";
+			if (items != null && !items.isEmpty()) {
+				for (int i = 0; i < items.size(); i++) {
+					MessageItem item = items.get(i);
+					temp += (item.getPhone() + ":\r\n" + item.getBody() + "\r\n");
+				}
+			}
+			return temp;
 		}
 
 		@Override
@@ -192,16 +199,19 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.btn_send:
 			try {
 				String fileName = UserSession.getDataStrFromTimeMillis(
-						System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss")
+						System.currentTimeMillis(), "汇总")
 						+ ".txt";
+				String filePath = NormalUtil.getRootDir();
+				if (FileUtils.checkFileExist(filePath + fileName)) {
+					FileUtils.deleteFile(filePath + fileName);
+				}
 				FileUtils.saveToSDCardOrRAM(this, fileName,
-						adapter.getOutPutMessage(), NormalUtil.getRootDir());
+						adapter.getOutPutMessage(), filePath);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			break;
-
 		}
 	}
 }

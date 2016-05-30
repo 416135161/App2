@@ -339,7 +339,9 @@ public class FileUtils {
 			out.close();
 		} else {
 			PrintWriter out = new PrintWriter(context.openFileOutput(filename, Context.MODE_PRIVATE));
+		
 			out.write(content);
+			
 			out.close();
 		}
 	}
