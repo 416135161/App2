@@ -50,6 +50,8 @@ public class DBTool {
 				message.setBody(cursor.getString(cursor.getColumnIndex("body")));
 				message.setPhone(cursor.getString(cursor
 						.getColumnIndex("phone")));
+				message.setItems(Integer.valueOf(cursor.getString(cursor
+						.getColumnIndex("items"))));
 				list.add(message);
 			}
 		} catch (Exception e) {
@@ -74,6 +76,7 @@ public class DBTool {
 		contentValues.put("dateTime", item.getDate());
 		contentValues.put("phone", item.getPhone());
 		contentValues.put("body", item.getBody());
+		contentValues.put("items", item.getItems() + "");
 		db.replace(DatabaseHelper.TABLE_SMS, null, contentValues);
 
 		db.close();

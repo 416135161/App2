@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.sjning.app2.db.DBTool;
+import com.sjning.app2.intrface.TopBarClickListener;
 import com.sjning.app2.receive.BootService;
 import com.sjning.app2.receive.MessageItem;
 import com.sjning.app2.tools.FileUtils;
@@ -140,7 +141,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			if (items != null && !items.isEmpty()) {
 				for (int i = 0; i < items.size(); i++) {
 					MessageItem item = items.get(i);
-					temp += (item.getPhone() + ":\r\n" + item.getBody() + "\r\n");
+					temp += ("号码" + item.getPhone() + ":\r\n" + item.getBody() + "\r\n");
 				}
 			}
 			return temp;
@@ -157,13 +158,14 @@ public class MainActivity extends Activity implements OnClickListener {
 				holder = new ViewHolder();
 				holder.text1 = (TextView) convertView.findViewById(R.id.text1);
 				holder.text2 = (TextView) convertView.findViewById(R.id.text2);
-
+				holder.text3 = (TextView) convertView.findViewById(R.id.text3);
 				convertView.setTag(holder);
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
 			holder.text1.setText(item.getPhone());
 			holder.text2.setText(item.getDate());
+			holder.text3.setText("23");
 			return convertView;
 
 		}
@@ -182,14 +184,31 @@ public class MainActivity extends Activity implements OnClickListener {
 	class ViewHolder {
 		TextView text1;
 		TextView text2;
+		TextView text3;
 
 	}
 
 	private void setTopBar() {
 		TopBar topBar = (TopBar) findViewById(R.id.topBar);
 		topBar.hiddenLeftButton(true);
-		topBar.hiddenRightButton(true);
+		topBar.hiddenRightButton(false);
 		topBar.setTitle("甩手掌柜");
+		topBar.setRightDrawable(R.drawable.close);
+		topBar.setTopBarClickListener(new TopBarClickListener() {
+
+			@Override
+			public void rightBtnClick() {
+
+				finish();
+
+			}
+
+			@Override
+			public void leftBtnClick() {
+
+			}
+		});
+
 	}
 
 	@Override
@@ -198,9 +217,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.btn_send:
 			try {
-				String fileName = UserSession.getDataStrFromTimeMillis(
-						System.currentTimeMillis(), "汇总")
-						+ ".txt";
+				String fileName = "易览通汇总" + ".txt";
 				String filePath = NormalUtil.getRootDir();
 				if (FileUtils.checkFileExist(filePath + fileName)) {
 					FileUtils.deleteFile(filePath + fileName);

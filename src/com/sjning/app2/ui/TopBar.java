@@ -96,7 +96,7 @@ public class TopBar extends RelativeLayout {
 		leftBtn.setText("返回");
 
 		rightBtn.setVisibility(View.GONE);
-		rightBtn.setBackgroundResource(R.drawable.base_title_search);
+		rightBtn.setBackgroundColor(0x00ffffff);
 
 		title.setEllipsize(TruncateAt.MIDDLE);
 		title.setGravity(Gravity.CENTER_HORIZONTAL);

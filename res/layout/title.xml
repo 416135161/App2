@@ -3,7 +3,7 @@
     xmlns:custom="http://schemas.android.com/apk/res/com.sjning.app2"
     android:id="@+id/title_frame"
     android:layout_width="fill_parent"
-    android:layout_height="50dp"
+    android:layout_height="60dp"
     android:orientation="vertical" >
 
     <com.sjning.app2.ui.TopBar
@@ -16,5 +16,11 @@
         android:paddingRight="@dimen/title_paddingright"
         custom:leftBackground="@drawable/title_bar_btn"
         custom:titleTextColor="@color/white_color" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="-30dp"
+        android:src="@drawable/logo" />
 
 </FrameLayout>

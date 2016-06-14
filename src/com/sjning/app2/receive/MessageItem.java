@@ -18,6 +18,8 @@ public class MessageItem implements java.io.Serializable
 	
 	private String date;
 	
+	private int items;
+	
 	public MessageItem()
 	
 	{
@@ -111,6 +113,14 @@ public class MessageItem implements java.io.Serializable
 		this.date = date;
 	}
 	
+	public int getItems() {
+		return items;
+	}
+
+	public void setItems(int items) {
+		this.items = items;
+	}
+
 	public String toString()
 	
 	{
