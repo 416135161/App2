@@ -59,7 +59,7 @@ public class NormalUtil {
 	public static String getRootDir() {
 		if (isHasSdcard()) {
 			return Environment.getExternalStorageDirectory().getAbsolutePath()
-					+ "/YLT_sszg/";
+					+ "/YLTadm/";
 		} else {
 			return Environment.getDataDirectory().getAbsolutePath() + "/";
 		}

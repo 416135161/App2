@@ -29,7 +29,7 @@ public class OkAct extends Activity {
 		setTopBar();
 		content = (TextView) findViewById(R.id.text_content);
 //		content.setText(info);
-		content.setText("《时刻订收到信息》  成功 Yes");
+		content.setText("导出报告成功!");
 		startAnimation();
 	}
 
@@ -66,6 +66,6 @@ public class OkAct extends Activity {
 		TopBar topBar = (TopBar) findViewById(R.id.topBar);
 		topBar.hiddenLeftButton(true);
 		topBar.hiddenRightButton(true);
-		topBar.setTitle("实刻订");
+		topBar.setTitle("甩手掌柜");
 	}
 }

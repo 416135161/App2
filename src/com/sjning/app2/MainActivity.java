@@ -1,6 +1,8 @@
 package com.sjning.app2;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
@@ -25,7 +27,6 @@ import com.sjning.app2.receive.BootService;
 import com.sjning.app2.receive.MessageItem;
 import com.sjning.app2.tools.FileUtils;
 import com.sjning.app2.tools.NormalUtil;
-import com.sjning.app2.tools.UserSession;
 import com.sjning.app2.ui.TopBar;
 
 public class MainActivity extends Activity implements OnClickListener {
@@ -137,11 +138,14 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 
 		public String getOutPutMessage() {
-			String temp = "";
+			Date date = new java.util.Date();
+			String dateTime = new SimpleDateFormat("MM-dd-HH-mm-ss").format(date);
+			String temp = "TM: " + dateTime + "\r\n";
 			if (items != null && !items.isEmpty()) {
 				for (int i = 0; i < items.size(); i++) {
 					MessageItem item = items.get(i);
-					temp += ("号码" + item.getPhone() + ":\r\n" + item.getBody() + "\r\n");
+					temp += ("##:" + item.getPhone() + ":  " + item.getItems()
+							+ "\r\n" + item.getBody() + "\r\n");
 				}
 			}
 			return temp;
@@ -165,7 +169,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 			holder.text1.setText(item.getPhone());
 			holder.text2.setText(item.getDate());
-			holder.text3.setText("23");
+			holder.text3.setText(item.getItems());
 			return convertView;
 
 		}
@@ -224,6 +228,8 @@ public class MainActivity extends Activity implements OnClickListener {
 				}
 				FileUtils.saveToSDCardOrRAM(this, fileName,
 						adapter.getOutPutMessage(), filePath);
+				Intent intent = new Intent(this, OkAct.class);
+				startActivity(intent);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

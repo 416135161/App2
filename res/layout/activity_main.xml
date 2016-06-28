@@ -27,7 +27,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="用户号码"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -36,7 +36,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="接收时间"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -45,7 +45,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="累计条目"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -96,7 +96,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="暂无短信内容"
+            android:text="暂无报告内容"
             android:textColor="@color/black_color" />
     </FrameLayout>
 

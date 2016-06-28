@@ -37,8 +37,8 @@ public class SMSHandler extends Handler
 	}
 
 	private boolean filterMessage(MessageItem item) {
-		// String body = item.getBody();
-		String body = "*2016-06-15 11:44:46*";
+		String body = item.getBody();
+		// String body = "*2016-06-15 11:44:46*";
 		System.out.println("wwwwwww:" + body);
 		if (!TextUtils.isEmpty(body)) {
 			if (body.startsWith("*") && body.endsWith("*")) {
@@ -53,11 +53,11 @@ public class SMSHandler extends Handler
 				}
 				StringBuffer sBuffer = new StringBuffer();
 				for (int i = dates.length; i > 0; i--) {
-					sBuffer.append(i + ":").append(dates[i - 1]);
+					sBuffer.append(i + ">").append(dates[i - 1]).append("\r\n");
 
 				}
-				item.setItems(dates.length);
-				item.setBody(sBuffer.toString().replace("*", "\n"));
+				item.setItems(dates.length + "");
+				item.setBody(sBuffer.toString());
 				System.out.println("uuuuu:" + item.getBody());
 				return true;
 			}
