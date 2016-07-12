@@ -90,14 +90,37 @@
             </LinearLayout>
         </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/nodata"
-            style="@style/text_nodata_style"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="暂无报告内容"
-            android:textColor="@color/black_color" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="15dp"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Tips：如短信里接收到了数据，仍无报告内容显示，请重启软件："
+                android:textColor="@color/black_color" />
+
+            <Button
+                android:id="@+id/btn_restart"
+                android:layout_width="120dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="15dp"
+                android:text="重启软件"
+                android:textColor="@color/black_color"
+                android:textSize="14sp" />
+
+            <TextView
+                style="@style/text_nodata_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="暂无报告内容"
+                android:textColor="@color/black_color" />
+        </LinearLayout>
     </FrameLayout>
 
 </LinearLayout>

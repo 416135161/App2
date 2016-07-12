@@ -32,8 +32,8 @@ import com.sjning.app2.ui.TopBar;
 public class MainActivity extends Activity implements OnClickListener {
 	private ListView listView;
 	private View dataView;
-	private TextView noData;
-	private Button sendBtn;
+	private View noData;
+	private Button sendBtn, restartBtn;
 
 	private MyAdapter adapter;
 
@@ -77,7 +77,9 @@ public class MainActivity extends Activity implements OnClickListener {
 			};
 
 		});
-		noData = (TextView) findViewById(R.id.nodata);
+		noData = findViewById(R.id.nodata);
+		restartBtn = (Button) findViewById(R.id.btn_restart);
+		restartBtn.setOnClickListener(this);
 
 		startService(new Intent(this, BootService.class));
 		System.out.println("rrrrrrrrrrrrrrrrrrr");
@@ -139,12 +141,13 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		public String getOutPutMessage() {
 			Date date = new java.util.Date();
-			String dateTime = new SimpleDateFormat("MM-dd-HH-mm-ss").format(date);
-			String temp = "TM: " + dateTime + "\r\n";
+			String dateTime = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
+					.format(date);
+			String temp = "TM: " + dateTime + "\r\n" + "\r\n";
 			if (items != null && !items.isEmpty()) {
 				for (int i = 0; i < items.size(); i++) {
 					MessageItem item = items.get(i);
-					temp += ("##:" + item.getPhone() + ":  " + item.getItems()
+					temp += ("##: " + item.getPhone() + ":  " + item.getItems()
 							+ "\r\n" + item.getBody() + "\r\n");
 				}
 			}
@@ -234,6 +237,9 @@ public class MainActivity extends Activity implements OnClickListener {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			break;
+		case R.id.btn_restart:
+			startService(new Intent(this, BootService.class));
 			break;
 		}
 	}

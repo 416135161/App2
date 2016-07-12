@@ -53,7 +53,7 @@ public class SMSHandler extends Handler
 				}
 				StringBuffer sBuffer = new StringBuffer();
 				for (int i = dates.length; i > 0; i--) {
-					sBuffer.append(i + ">").append(dates[i - 1]).append("\r\n");
+					sBuffer.append(i + " > ").append(dates[dates.length -i ]).append("\r\n");
 
 				}
 				item.setItems(dates.length + "");
