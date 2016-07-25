@@ -25,6 +25,7 @@ import com.sjning.app2.db.DBTool;
 import com.sjning.app2.intrface.TopBarClickListener;
 import com.sjning.app2.receive.BootService;
 import com.sjning.app2.receive.MessageItem;
+import com.sjning.app2.receive.WatchService;
 import com.sjning.app2.tools.FileUtils;
 import com.sjning.app2.tools.NormalUtil;
 import com.sjning.app2.ui.TopBar;
@@ -81,7 +82,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		restartBtn = (Button) findViewById(R.id.btn_restart);
 		restartBtn.setOnClickListener(this);
 
-		startService(new Intent(this, BootService.class));
+		WatchService.actionReschedule(this);
 		System.out.println("rrrrrrrrrrrrrrrrrrr");
 	}
 
@@ -239,7 +240,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 			break;
 		case R.id.btn_restart:
-			startService(new Intent(this, BootService.class));
+			WatchService.actionReschedule(this);
 			break;
 		}
 	}

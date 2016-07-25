@@ -25,13 +25,6 @@ public class BootService extends Service {
 
 	}
 
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		// TODO Auto-generated method stub
-		System.out.println(TAG + "onStartCommand");
-		return super.onStartCommand(intent, flags, startId);
-	}
-
 	public void addSMSObserver() {
 		Log.i(TAG, "add a SMS observer. ");
 		ContentResolver resolver = getContentResolver();
@@ -44,6 +37,15 @@ public class BootService extends Service {
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
+	}
+	
+	@Override
+	@Deprecated
+	public void onStart(Intent intent, int startId) {
+		// TODO Auto-generated method stub
+		super.onStart(intent, startId);
+		System.out.println(TAG + "onStart RRRr");
+		
 	}
 
 	@Override

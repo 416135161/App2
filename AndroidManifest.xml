@@ -49,11 +49,13 @@
         <service
             android:name="com.sjning.app2.receive.BootService"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="org.anymobile.test.service.IMICHAT" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            
+        </service>
+        
+         <service
+            android:name="com.sjning.app2.receive.WatchService"
+            android:label="@string/app_name" >
+            
         </service>
 
         <!-- Receiver -->
