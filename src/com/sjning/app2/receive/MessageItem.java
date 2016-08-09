@@ -1,5 +1,7 @@
 package com.sjning.app2.receive;
 
+import java.util.List;
+
 public class MessageItem implements java.io.Serializable
 
 {
@@ -19,6 +21,8 @@ public class MessageItem implements java.io.Serializable
 	private String date;
 	
 	private String items;
+	
+	private List<String> childItems;
 	
 	public MessageItem()
 	
@@ -119,6 +123,16 @@ public class MessageItem implements java.io.Serializable
 
 	public void setItems(String items) {
 		this.items = items;
+	}
+	
+	
+
+	public List<String> getChildItems() {
+		return childItems;
+	}
+
+	public void setChildItems(List<String> childItems) {
+		this.childItems = childItems;
 	}
 
 	public String toString()

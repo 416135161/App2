@@ -12,6 +12,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	// 巡检项表
 	public static final String TABLE_SMS = "table_sms";
 
+	public static final String TABLE_SMS_CHILD = "table_sms_child";
+
 	// 巡检项类型表
 
 	public DatabaseHelper(Context context, String name, CursorFactory factory,
@@ -33,7 +35,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		String sqlStr1 = "create table "
 				+ TABLE_SMS
 				+ "(phone varchar(20) primary key, dateTime varchar(30) ,body text, items text)";
+
+		String sqlStr2 = "create table "
+				+ TABLE_SMS_CHILD
+				+ "(phone varchar(20), childItem text, primary key(phone, childItem))";
+
 		db.execSQL(sqlStr1);
+		db.execSQL(sqlStr2);
 
 	}
 

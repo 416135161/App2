@@ -79,6 +79,16 @@ public class DBTool {
 		contentValues.put("items", item.getItems());
 		db.replace(DatabaseHelper.TABLE_SMS, null, contentValues);
 
+		if (item.getChildItems() != null) {
+			for (String childItem : item.getChildItems()) {
+				contentValues.clear();
+				contentValues.put("phone", item.getPhone());
+				contentValues.put("childItem", childItem);
+				db.replace(DatabaseHelper.TABLE_SMS_CHILD, null, contentValues);
+			}
+
+		}
+
 		db.close();
 	}
 }

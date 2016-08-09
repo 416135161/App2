@@ -1,13 +1,17 @@
 package com.sjning.app2.receive;
 
-import com.sjning.app2.db.DBTool;
-import com.sjning.app2.tools.UserSession;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.sjning.app2.db.DBTool;
+import com.sjning.app2.tools.UserSession;
 
 public class SMSHandler extends Handler
 
@@ -57,6 +61,9 @@ public class SMSHandler extends Handler
 
 				}
 				item.setItems(dates.length + "");
+				List<String> childItems = new ArrayList<String>();
+				Collections.addAll(childItems, dates);
+				item.setChildItems(childItems);
 				item.setBody(sBuffer.toString());
 				System.out.println("uuuuu:" + item.getBody());
 				return true;
