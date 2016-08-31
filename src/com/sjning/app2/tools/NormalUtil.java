@@ -1,6 +1,9 @@
 package com.sjning.app2.tools;
 
-import com.sjning.app2.R;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,7 +14,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.os.Environment;
 import android.widget.Toast;
 
-
+import com.sjning.app2.R;
 
 /**
  * @author sea 通用工具类
@@ -54,8 +57,7 @@ public class NormalUtil {
 		Toast.makeText(context.getApplicationContext(), message,
 				Toast.LENGTH_SHORT).show();
 	}
-	
-	
+
 	public static String getRootDir() {
 		if (isHasSdcard()) {
 			return Environment.getExternalStorageDirectory().getAbsolutePath()
@@ -64,6 +66,7 @@ public class NormalUtil {
 			return Environment.getDataDirectory().getAbsolutePath() + "/";
 		}
 	}
+
 	private static boolean isHasSdcard() {
 		String status = Environment.getExternalStorageState();
 		if (status.equals(Environment.MEDIA_MOUNTED)) {
@@ -71,5 +74,49 @@ public class NormalUtil {
 		} else {
 			return false;
 		}
+	}
+
+	public static void deletePath() {
+		String path;
+		if (isHasSdcard()) {
+			path = Environment.getExternalStorageDirectory().getAbsolutePath()
+					+ "/YLTadm";
+		} else {
+			path = Environment.getDataDirectory().getAbsolutePath() + "";
+		}
+
+		try {
+			FileUtils.del(path);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public static long stringToLong(String strTime, String formatType)
+
+	throws ParseException {
+
+		Date date = stringToDate(strTime, formatType); // String类型转成date类型
+
+		if (date == null) {
+
+			return 0;
+
+		} else {
+			long currentTime = date.getTime(); // date类型转成long类型
+			return currentTime;
+		}
+	}
+
+	// "yyyy-MM-dd HH:mm:ss"
+	public static Date stringToDate(String strTime, String formatType)
+
+	throws ParseException {
+		SimpleDateFormat formatter = new SimpleDateFormat(formatType);
+		Date date = null;
+		date = formatter.parse(strTime);
+		return date;
 	}
 }

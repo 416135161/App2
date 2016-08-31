@@ -19,9 +19,9 @@ public class MessageAct extends Activity {
 		data = (TextView) findViewById(R.id.data);
 		MessageItem message = (MessageItem) getIntent().getSerializableExtra(
 				"message");
-//		data.setText(message.getPhone() + "\n" + message.getDate() + "\n"
-//				+ message.getBody());
-		data.setText(message.getBody());
+		// data.setText(message.getPhone() + "\n" + message.getDate() + "\n"
+		// + message.getBody());
+		data.setText(getItemBody(message));
 	}
 
 	private void setTopBar() {
@@ -44,6 +44,17 @@ public class MessageAct extends Activity {
 
 			}
 		});
-		
+
+	}
+
+	private String getItemBody(MessageItem item) {
+		StringBuffer sBuffer = new StringBuffer();
+		int size = item.getChildItems().size();
+		for (int i = size; i > 0; i--) {
+			sBuffer.append(i + " > ")
+					.append(item.getChildItems().get(size - i)).append("\r\n");
+
+		}
+		return sBuffer.toString();
 	}
 }

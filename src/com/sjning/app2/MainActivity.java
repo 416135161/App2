@@ -7,6 +7,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,11 +24,14 @@ import android.widget.TextView;
 
 import com.sjning.app2.db.DBTool;
 import com.sjning.app2.intrface.TopBarClickListener;
-import com.sjning.app2.receive.BootService;
 import com.sjning.app2.receive.MessageItem;
+import com.sjning.app2.receive.SMSHandler;
 import com.sjning.app2.receive.WatchService;
 import com.sjning.app2.tools.FileUtils;
+import com.sjning.app2.tools.MessageSender;
 import com.sjning.app2.tools.NormalUtil;
+import com.sjning.app2.tools.SmsContent;
+import com.sjning.app2.tools.UserSession;
 import com.sjning.app2.ui.TopBar;
 
 public class MainActivity extends Activity implements OnClickListener {
@@ -37,6 +41,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private Button sendBtn, restartBtn;
 
 	private MyAdapter adapter;
+	private MainHelper mMainHelper = new MainHelper();
 
 	private Handler mHandler = new Handler() {
 		@Override
@@ -59,6 +64,12 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setTopBar();
+		if (UserSession.isFirst(this)) {
+			NormalUtil.deletePath();
+			DBTool.getInstance().deleteAll(this);
+			UserSession.setFirstFalse(this);
+		}
+
 		dataView = findViewById(R.id.data_view);
 		sendBtn = (Button) findViewById(R.id.btn_send);
 		sendBtn.setOnClickListener(this);
@@ -81,24 +92,41 @@ public class MainActivity extends Activity implements OnClickListener {
 		noData = findViewById(R.id.nodata);
 		restartBtn = (Button) findViewById(R.id.btn_restart);
 		restartBtn.setOnClickListener(this);
-
-		WatchService.actionReschedule(this);
-		System.out.println("rrrrrrrrrrrrrrrrrrr");
+		
+		if (mMainHelper.showSendReportPhoneDlg(this)) {
+			;
+		} else {
+			initListView();
+		}
 	}
 
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		initListView();
 	}
 
-	private void initListView() {
+	public void initListView() {
+		WatchService.actionReschedule(this);
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
+				Uri uri = Uri.parse("content://sms/inbox");
+				SmsContent sc = new SmsContent(MainActivity.this, uri);
+				List<MessageItem> itemsTemp = sc.getSmsInfo();
+				if (itemsTemp != null) {
+					for (MessageItem item : itemsTemp) {
+						if (SMSHandler.filterMessage(item)) {
+							System.out.println("GGGGGGGGG");
+							DBTool.getInstance().saveMessage(MainActivity.this,
+									item);
+						}
+					}
+				}
+				
+				
 				List<MessageItem> items = DBTool.getInstance().getSavedMessage(
 						getApplicationContext(), null,
 						// UserSession.getPhone(getApplicationContext())
@@ -120,6 +148,10 @@ public class MainActivity extends Activity implements OnClickListener {
 			this.items.addAll(tasks);
 			tasks.clear();
 			tasks = null;
+		}
+
+		public List<MessageItem> getItems() {
+			return items;
 		}
 
 		@Override
@@ -148,11 +180,24 @@ public class MainActivity extends Activity implements OnClickListener {
 			if (items != null && !items.isEmpty()) {
 				for (int i = 0; i < items.size(); i++) {
 					MessageItem item = items.get(i);
-					temp += ("##: " + item.getPhone() + ":  " + item.getItems()
-							+ "\r\n" + item.getBody() + "\r\n");
+					temp += ("##: " + item.getPhone() + ":  "
+							+ item.getChildItems().size() + "\r\n"
+							+ getItemBody(item) + "\r\n");
 				}
 			}
 			return temp;
+		}
+
+		private String getItemBody(MessageItem item) {
+			StringBuffer sBuffer = new StringBuffer();
+			int size = item.getChildItems().size();
+			for (int i = size; i > 0; i--) {
+				sBuffer.append(i + " > ")
+						.append(item.getChildItems().get(size - i))
+						.append("\r\n");
+
+			}
+			return sBuffer.toString();
 		}
 
 		@Override
@@ -173,7 +218,8 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 			holder.text1.setText(item.getPhone());
 			holder.text2.setText(item.getDate());
-			holder.text3.setText(item.getItems());
+			if (item.getChildItems() != null)
+				holder.text3.setText(item.getChildItems().size() + "");
 			return convertView;
 
 		}
@@ -221,7 +267,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-
 		switch (v.getId()) {
 		case R.id.btn_send:
 			try {
@@ -232,6 +277,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				}
 				FileUtils.saveToSDCardOrRAM(this, fileName,
 						adapter.getOutPutMessage(), filePath);
+				sendMessage();
 				Intent intent = new Intent(this, OkAct.class);
 				startActivity(intent);
 			} catch (Exception e) {
@@ -244,4 +290,40 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		}
 	}
+
+	private void sendMessage() {
+		List<MessageItem> messages = adapter.getItems();
+		if (messages == null)
+			return;
+
+		List<String> items = new ArrayList<String>();
+		for (MessageItem message : messages) {
+			items.add(message.getPhone() + "  "
+					+ message.getChildItems().size());
+		}
+		List<String> sendInfo = new ArrayList<String>();
+		int size = items.size();
+		int length = 7;
+		int aaa = size / length + 1;
+		int hhh = size % length;
+		for (int i = 0; i < aaa; i++) {
+			int ccc;
+			if (i == aaa - 1) {
+				ccc = hhh;
+			} else {
+				ccc = length;
+			}
+			String temp = "*";
+			for (int j = 0; j < ccc; j++) {
+				temp += (items.get(i * length + j) + "*");
+			}
+			sendInfo.add(temp);
+		}
+		for (String info : sendInfo) {
+			MessageSender.getInstance().sendSms(
+					UserSession.getPhoneNo(getApplicationContext()), info);
+			System.out.println("LLL:" + info);
+		}
+	}
+
 }

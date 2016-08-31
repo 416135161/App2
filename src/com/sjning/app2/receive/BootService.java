@@ -4,9 +4,12 @@ import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+
+import com.sjning.app2.tools.SmsContent;
 
 public class BootService extends Service {
 
