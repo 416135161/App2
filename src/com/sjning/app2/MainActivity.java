@@ -303,7 +303,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		List<String> sendInfo = new ArrayList<String>();
 		int size = items.size();
-		int length = 7;
+		int length = 6;
 		int aaa = size / length + 1;
 		int hhh = size % length;
 		for (int i = 0; i < aaa; i++) {

@@ -84,6 +84,16 @@
     </LinearLayout>
     <!-- android:background="@drawable/login_btn" -->
 
+    <TextView
+        android:id="@+id/text_tip"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="获取新秘钥请与网站www.post-online.net\n公布的客服电话"
+        android:textColor="@color/green_color"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
     <Button
         android:layout_width="1400dp"
         android:layout_height="0dp"

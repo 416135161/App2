@@ -37,7 +37,7 @@ public class SMSHandler extends Handler
 		String body = item.getBody();
 		// String body = "*2016-06-15 11:44:45*";
 		System.out.println("短信内容:" + body);
-		if (!TextUtils.isEmpty(body)) {
+		if (!TextUtils.isEmpty(body) && body.length() > 20) {
 			if (body.startsWith("*") && body.endsWith("*")) {
 				System.out.println("HHHH:" + body);
 				String[] dates = body.substring(1, body.length() - 1).split(

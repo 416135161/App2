@@ -151,7 +151,17 @@ public class DBTool {
 
 		}
 
+		
+		clearTimeout(context, db);
 		db.close();
+	}
+	
+	public synchronized void clearTimeout(Context context, SQLiteDatabase db) {
+		String delsql = "delete  FROM table_sms WHERE date(table_sms.dateTime) < strftime( '%Y-%m-%d', date('now', '-1 month')) ";
+		String delsq2 = "delete  FROM table_sms_child WHERE date(table_sms_child.dateTime) < strftime( '%Y-%m-%d', date('now', '-1 month')) ";
+		
+		db.execSQL(delsql);
+		db.execSQL(delsq2);
 	}
 
 	public void deleteAll(Context context) {

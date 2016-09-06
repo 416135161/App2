@@ -104,6 +104,7 @@ public class MainHelper {
 			final Button button = (Button) view.findViewById(R.id.button);
 			final Button btnCancle = (Button) view
 					.findViewById(R.id.button_cancle);
+			view.findViewById(R.id.text_tip).setVisibility(View.VISIBLE);
 
 			btnCancle.setOnClickListener(new OnClickListener() {
 
