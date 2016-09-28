@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,10 +40,12 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ListView listView;
 	private View dataView;
 	private View noData;
-	private Button sendBtn, restartBtn;
+	private Button sendBtn, restartBtn, cleanBtn;
 
 	private MyAdapter adapter;
 	private MainHelper mMainHelper = new MainHelper();
+
+	private Dialog deleteDialog;
 
 	private Handler mHandler = new Handler() {
 		@Override
@@ -92,12 +96,15 @@ public class MainActivity extends Activity implements OnClickListener {
 		noData = findViewById(R.id.nodata);
 		restartBtn = (Button) findViewById(R.id.btn_restart);
 		restartBtn.setOnClickListener(this);
-		
+		cleanBtn = (Button) findViewById(R.id.btn_clean);
+		cleanBtn.setOnClickListener(this);
+
 		if (mMainHelper.showSendReportPhoneDlg(this)) {
 			;
 		} else {
 			initListView();
 		}
+
 	}
 
 	@Override
@@ -125,15 +132,12 @@ public class MainActivity extends Activity implements OnClickListener {
 						}
 					}
 				}
-				
-				
+
 				List<MessageItem> items = DBTool.getInstance().getSavedMessage(
 						getApplicationContext(), null,
 						// UserSession.getPhone(getApplicationContext())
 						null);
-				if (items != null) {
-					adapter.setData(items);
-				}
+				adapter.setData(items);
 				mHandler.sendEmptyMessage(0);
 			}
 
@@ -145,9 +149,11 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		public void setData(List<MessageItem> tasks) {
 			this.items.clear();
-			this.items.addAll(tasks);
-			tasks.clear();
-			tasks = null;
+			if(tasks != null){
+				this.items.addAll(tasks);
+				tasks.clear();
+				tasks = null;
+			}
 		}
 
 		public List<MessageItem> getItems() {
@@ -270,7 +276,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.btn_send:
 			try {
-				String fileName = "易览通汇总" + ".txt";
+				SimpleDateFormat tempDate = new SimpleDateFormat("yyyyMM");
+				String datetime = tempDate.format(new java.util.Date());
+				String fileName = "易览通汇总" + "-"+ datetime + ".txt";
 				String filePath = NormalUtil.getRootDir();
 				if (FileUtils.checkFileExist(filePath + fileName)) {
 					FileUtils.deleteFile(filePath + fileName);
@@ -287,6 +295,43 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.btn_restart:
 			WatchService.actionReschedule(this);
+			break;
+		case R.id.btn_clean:
+			final boolean isExit = isSystemMsgExit();
+			View view = getLayoutInflater().inflate(R.layout.dlg_delete, null);
+			final Button button = (Button) view.findViewById(R.id.button);
+			final Button btnCancle = (Button) view
+					.findViewById(R.id.button_cancle);
+			TextView textTip = (TextView) view.findViewById(R.id.text_tip);
+			if(isExit){
+				textTip.setText("清空数据之前需先删除短信里的相关数据！");
+			}else{
+				textTip.setText("清空列表数据前确定已把数据发送导出？");
+			}
+			
+			btnCancle.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					deleteDialog.dismiss();
+				}
+			});
+			button.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					if(isExit){
+						
+					}else{
+						DBTool.getInstance().deleteAll(MainActivity.this);
+						NormalUtil.deletePath();
+						initListView();
+					}
+					deleteDialog.dismiss();
+				}
+			});
+			deleteDialog = new AlertDialog.Builder(this).setView(view).create();
+			deleteDialog.setCanceledOnTouchOutside(true);
+			deleteDialog.show();
 			break;
 		}
 	}
@@ -324,6 +369,20 @@ public class MainActivity extends Activity implements OnClickListener {
 					UserSession.getPhoneNo(getApplicationContext()), info);
 			System.out.println("LLL:" + info);
 		}
+	}
+
+	private boolean isSystemMsgExit() {
+		Uri uri = Uri.parse("content://sms/inbox");
+		SmsContent sc = new SmsContent(MainActivity.this, uri);
+		List<MessageItem> itemsTemp = sc.getSmsInfo();
+		if (itemsTemp != null) {
+			for (MessageItem item : itemsTemp) {
+				if (SMSHandler.filterMessage(item)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }
