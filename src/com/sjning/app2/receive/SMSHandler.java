@@ -44,7 +44,7 @@ public class SMSHandler extends Handler
 						"\\*");
 				for (String date : dates) {
 					System.out.println("kkkkk:" + date);
-					if (date.length() != 19) {
+					if (date.length() < 19 || date.length() > 24) {
 						return false;
 					}
 				}
