@@ -12,6 +12,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.sjning.app2.receive.MessageItem;
 import com.sjning.app2.tools.NormalUtil;
@@ -108,26 +109,49 @@ public class DBTool {
 		if (childItems != null && childItems.size() > 0) {
 			List<Date> dates = new ArrayList<Date>();
 			for (String childItem : childItems) {
+				Log.e("JJJJJJ:", childItem);
 				try {
-					Date date = NormalUtil.stringToDate(childItem,
-							"yyyy-MM-dd HH:mm:ss");
+					Date date = NormalUtil.stringToDate(
+							childItem.substring(0, 19), "yyyy-MM-dd HH:mm:ss");
 					dates.add(date);
+
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
+			//排序
 			Collections.sort(dates);
-			childItems.clear();
+			//还原为日期
+			List<String> temps = new ArrayList<String>();
 			for (int i = dates.size() - 1; i >= 0; i--) {
 				SimpleDateFormat tempDate = new SimpleDateFormat(
 						"yyyy-MM-dd HH:mm:ss");
 				String datetime = tempDate.format(dates.get(i));
-				childItems.add(datetime);
+				Log.e("KKKKKKK:", datetime);
+				temps.add(datetime);
 			}
+			//将原内容按照排序重新组装
+			List<String> results = new ArrayList<String>();
+			for (int j = 0; j < temps.size(); j++) {
+				String string1 = temps.get(j);
+				for (int i = 0; i < childItems.size(); i++) {
+					String string2 = childItems.get(i);
+					Log.e("aaaaaaaaa:", string1);
+					if (TextUtils.equals(string2.substring(0, 19), string1)) {
+						Log.e("EEEEEEEEE:", string2);
+						results.add(string2);
+					}
+				}
+			}
+			//打印排序的结果
+			for (String hhh : results) {
+				Log.e("FFFFFFFF:", hhh);
+			}
+			childItems.clear();
+			temps.clear();
+			item.setChildItems(results);
 		}
-
-		item.setChildItems(childItems);
 	}
 
 	public synchronized void saveMessage(Context context, MessageItem item) {
@@ -151,15 +175,14 @@ public class DBTool {
 
 		}
 
-		
 		clearTimeout(context, db);
 		db.close();
 	}
-	
+
 	public synchronized void clearTimeout(Context context, SQLiteDatabase db) {
 		String delsql = "delete  FROM table_sms WHERE date(table_sms.dateTime) < strftime( '%Y-%m-%d', date('now', '-1 month')) ";
 		String delsq2 = "delete  FROM table_sms_child WHERE date(table_sms_child.dateTime) < strftime( '%Y-%m-%d', date('now', '-1 month')) ";
-		
+
 		db.execSQL(delsql);
 		db.execSQL(delsq2);
 	}
