@@ -13,6 +13,8 @@ public class UserSession {
 	private static final String PHONE_NO_KEY = "phone_no";
 	private static final String DATE_KEY = "date";
 
+	
+	private static final String MY_PHONE = "my_phone";
 	public static String getPhoneNo(Context context) {
 		return context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE)
 				.getString(PHONE_NO_KEY, "");
@@ -49,6 +51,17 @@ public class UserSession {
 		SharedPreferences sharedPreferences = context.getSharedPreferences(
 				SPNAME, Context.MODE_PRIVATE);
 		sharedPreferences.edit().putString(DATE_KEY, date).commit();
+	}
+	
+	public static String getMyPhone(Context context) {
+		return context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE)
+				.getString(MY_PHONE, "");
+	}
+
+	public static void setMyPhone(Context context, String phone) {
+		SharedPreferences sharedPreferences = context.getSharedPreferences(
+				SPNAME, Context.MODE_PRIVATE);
+		sharedPreferences.edit().putString(MY_PHONE, phone).commit();
 	}
 
 }

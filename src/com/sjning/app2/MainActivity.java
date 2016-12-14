@@ -3,16 +3,21 @@ package com.sjning.app2;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,15 +26,22 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.sjning.app2.db.DBTool;
 import com.sjning.app2.intrface.TopBarClickListener;
 import com.sjning.app2.receive.MessageItem;
 import com.sjning.app2.receive.SMSHandler;
 import com.sjning.app2.receive.WatchService;
 import com.sjning.app2.tools.FileUtils;
+import com.sjning.app2.tools.HttpUtil;
 import com.sjning.app2.tools.MessageSender;
 import com.sjning.app2.tools.NormalUtil;
 import com.sjning.app2.tools.SmsContent;
@@ -40,7 +52,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ListView listView;
 	private View dataView;
 	private View noData;
-	private Button sendBtn, restartBtn, cleanBtn;
+	private Button sendBtn, restartBtn, cleanBtn, acquireBtn;
 
 	private MyAdapter adapter;
 	private MainHelper mMainHelper = new MainHelper();
@@ -98,6 +110,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		restartBtn.setOnClickListener(this);
 		cleanBtn = (Button) findViewById(R.id.btn_clean);
 		cleanBtn.setOnClickListener(this);
+		acquireBtn = (Button) findViewById(R.id.btn_acquire);
+		acquireBtn.setOnClickListener(this);
 
 		if (mMainHelper.showSendReportPhoneDlg(this)) {
 			;
@@ -149,7 +163,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		public void setData(List<MessageItem> tasks) {
 			this.items.clear();
-			if(tasks != null){
+			if (tasks != null) {
 				this.items.addAll(tasks);
 				tasks.clear();
 				tasks = null;
@@ -278,7 +292,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			try {
 				SimpleDateFormat tempDate = new SimpleDateFormat("yyyyMM");
 				String datetime = tempDate.format(new java.util.Date());
-				String fileName = "易览通汇总" + "-"+ datetime + ".txt";
+				String fileName = "易览通汇总" + "-" + datetime + ".txt";
 				String filePath = NormalUtil.getRootDir();
 				if (FileUtils.checkFileExist(filePath + fileName)) {
 					FileUtils.deleteFile(filePath + fileName);
@@ -303,12 +317,12 @@ public class MainActivity extends Activity implements OnClickListener {
 			final Button btnCancle = (Button) view
 					.findViewById(R.id.button_cancle);
 			TextView textTip = (TextView) view.findViewById(R.id.text_tip);
-			if(isExit){
+			if (isExit) {
 				textTip.setText("清空数据之前需先删除短信里的相关数据！");
-			}else{
+			} else {
 				textTip.setText("清空列表数据前确定已把数据发送导出？");
 			}
-			
+
 			btnCancle.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -319,9 +333,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
 				@Override
 				public void onClick(View v) {
-					if(isExit){
-						
-					}else{
+					if (isExit) {
+
+					} else {
 						DBTool.getInstance().deleteAll(MainActivity.this);
 						NormalUtil.deletePath();
 						initListView();
@@ -332,6 +346,15 @@ public class MainActivity extends Activity implements OnClickListener {
 			deleteDialog = new AlertDialog.Builder(this).setView(view).create();
 			deleteDialog.setCanceledOnTouchOutside(true);
 			deleteDialog.show();
+			break;
+
+		case R.id.btn_acquire:
+			if(TextUtils.isEmpty(UserSession.getMyPhone(getApplicationContext()))){
+				showSetMyPhoneDlg();
+			}else{
+				getInternet(this);
+			}
+			
 			break;
 		}
 	}
@@ -383,6 +406,117 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 		}
 		return false;
+	}
+
+	private void getInternet(Context context) {
+		showWaitDialog();
+		StringRequest stringRequest = new StringRequest(Request.Method.POST,
+				HttpUtil.SERVER_ADDRESS + "app/comment/list.do",
+				new Response.Listener<String>() {
+					@Override
+					public void onResponse(String response) {
+						closeWaitDialog();
+						Log.e("TAG", response);
+						Toast.makeText(MainActivity.this, "获取数据成功", Toast.LENGTH_SHORT);
+
+					}
+				}, new Response.ErrorListener() {
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						closeWaitDialog();
+						Log.e("TAG", error.getMessage(), error);
+						Toast.makeText(MainActivity.this, "获取数据失败，请检查网络", Toast.LENGTH_SHORT);
+					}
+				}) {
+			@Override
+			protected Map<String, String> getParams() {
+				// 在这里设置需要post的参数
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("recivephone", UserSession.getMyPhone(getApplicationContext()));
+				return map;
+			}
+		};
+		HttpUtil.getInstance().addRequest(stringRequest, context);
+	}
+	
+	private Dialog dialog;
+	private void showSetMyPhoneDlg() {
+		if (dialog == null) {
+			View view = getLayoutInflater().inflate(R.layout.set_my_phone,
+					null);
+			final EditText text1 = (EditText) view.findViewById(R.id.text1);
+			final EditText text2 = (EditText) view.findViewById(R.id.text2);
+			final Button button = (Button) view.findViewById(R.id.button);
+			final Button btnCancle = (Button) view
+					.findViewById(R.id.button_cancle);
+
+			btnCancle.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					dialog.dismiss();
+				}
+			});
+			button.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					String phoneNo1 = text1.getEditableText().toString();
+					String phoneNo2 = text2.getEditableText().toString();
+					if (TextUtils.isEmpty(phoneNo1) || phoneNo1.length() != 11) {
+						NormalUtil.displayMessage(getApplicationContext(),
+								"输入的非手机号码！");
+						dialog.show();
+						return;
+					}
+
+					if (TextUtils.isEmpty(phoneNo2) || phoneNo2.length() != 11) {
+						NormalUtil.displayMessage(getApplicationContext(),
+								"重新输入的非手机号码！");
+						dialog.show();
+						return;
+					}
+
+					if (!TextUtils.equals(phoneNo1, phoneNo2)) {
+						NormalUtil.displayMessage(getApplicationContext(),
+								"请两次输入相同的手机号码！");
+						dialog.show();
+						return;
+					}
+					UserSession.setMyPhone(getApplicationContext(),
+							phoneNo1);
+					
+					dialog.dismiss();
+				}
+			});
+			dialog = new AlertDialog.Builder(MainActivity.this).setView(view)
+					.create();
+			dialog.setCanceledOnTouchOutside(false);
+			dialog.show();
+		} else
+			dialog.show();
+
+	}
+	
+	
+	private Dialog waitDialog;
+	private void showWaitDialog() {
+		if (waitDialog == null) {
+			View view = getLayoutInflater().inflate(R.layout.common_dialog_loading_layout,
+					null);
+			waitDialog = new AlertDialog.Builder(MainActivity.this).setView(view)
+					.create();
+			waitDialog.setCanceledOnTouchOutside(false);
+			waitDialog.show();
+		} else
+			waitDialog.show();
+	}
+	
+	private void closeWaitDialog(){
+		if(waitDialog != null && waitDialog.isShowing())
+			waitDialog.dismiss();
 	}
 
 }
