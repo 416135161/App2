@@ -29,12 +29,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.sjning.app2.bean.GetNetMessageBean;
+import com.sjning.app2.bean.GetNetMessageBean.ResultBean;
+import com.sjning.app2.bean.GetNetMessageBean.ResultBean.ContentsBean;
 import com.sjning.app2.db.DBTool;
 import com.sjning.app2.intrface.TopBarClickListener;
 import com.sjning.app2.receive.MessageItem;
@@ -42,6 +44,7 @@ import com.sjning.app2.receive.SMSHandler;
 import com.sjning.app2.receive.WatchService;
 import com.sjning.app2.tools.FileUtils;
 import com.sjning.app2.tools.HttpUtil;
+import com.sjning.app2.tools.JsonUtil;
 import com.sjning.app2.tools.MessageSender;
 import com.sjning.app2.tools.NormalUtil;
 import com.sjning.app2.tools.SmsContent;
@@ -349,12 +352,12 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 
 		case R.id.btn_acquire:
-			if(TextUtils.isEmpty(UserSession.getMyPhone(getApplicationContext()))){
+			if (TextUtils.isEmpty(UserSession
+					.getMyPhone(getApplicationContext()))) {
 				showSetMyPhoneDlg();
-			}else{
+			} else {
 				getInternet(this);
 			}
-			
 			break;
 		}
 	}
@@ -417,33 +420,39 @@ public class MainActivity extends Activity implements OnClickListener {
 					public void onResponse(String response) {
 						closeWaitDialog();
 						Log.e("TAG", response);
-						Toast.makeText(MainActivity.this, "获取数据成功", Toast.LENGTH_SHORT);
-
+						NormalUtil.displayMessage(getApplicationContext(),
+								"获取数据成功");
+						if (!TextUtils.isEmpty(response)) {
+							dealNetGetBean(response);
+						}
 					}
 				}, new Response.ErrorListener() {
 					@Override
 					public void onErrorResponse(VolleyError error) {
 						closeWaitDialog();
 						Log.e("TAG", error.getMessage(), error);
-						Toast.makeText(MainActivity.this, "获取数据失败，请检查网络", Toast.LENGTH_SHORT);
+						NormalUtil.displayMessage(getApplicationContext(),
+								"获取数据失败，请检查网络");
 					}
 				}) {
 			@Override
 			protected Map<String, String> getParams() {
 				// 在这里设置需要post的参数
 				Map<String, String> map = new HashMap<String, String>();
-				map.put("recivephone", UserSession.getMyPhone(getApplicationContext()));
+				map.put("recivephone",
+						UserSession.getMyPhone(getApplicationContext()));
 				return map;
 			}
 		};
 		HttpUtil.getInstance().addRequest(stringRequest, context);
 	}
-	
+
 	private Dialog dialog;
+
 	private void showSetMyPhoneDlg() {
 		if (dialog == null) {
-			View view = getLayoutInflater().inflate(R.layout.set_my_phone,
-					null);
+			View view = getLayoutInflater()
+					.inflate(R.layout.set_my_phone, null);
 			final EditText text1 = (EditText) view.findViewById(R.id.text1);
 			final EditText text2 = (EditText) view.findViewById(R.id.text2);
 			final Button button = (Button) view.findViewById(R.id.button);
@@ -485,9 +494,8 @@ public class MainActivity extends Activity implements OnClickListener {
 						dialog.show();
 						return;
 					}
-					UserSession.setMyPhone(getApplicationContext(),
-							phoneNo1);
-					
+					UserSession.setMyPhone(getApplicationContext(), phoneNo1);
+
 					dialog.dismiss();
 				}
 			});
@@ -499,24 +507,54 @@ public class MainActivity extends Activity implements OnClickListener {
 			dialog.show();
 
 	}
-	
-	
+
 	private Dialog waitDialog;
+
 	private void showWaitDialog() {
 		if (waitDialog == null) {
-			View view = getLayoutInflater().inflate(R.layout.common_dialog_loading_layout,
-					null);
-			waitDialog = new AlertDialog.Builder(MainActivity.this).setView(view)
-					.create();
+			View view = getLayoutInflater().inflate(
+					R.layout.common_dialog_loading_layout, null);
+			waitDialog = new AlertDialog.Builder(MainActivity.this).setView(
+					view).create();
 			waitDialog.setCanceledOnTouchOutside(false);
 			waitDialog.show();
 		} else
 			waitDialog.show();
 	}
-	
-	private void closeWaitDialog(){
-		if(waitDialog != null && waitDialog.isShowing())
+
+	private void closeWaitDialog() {
+		if (waitDialog != null && waitDialog.isShowing())
 			waitDialog.dismiss();
+	}
+
+	private void dealNetGetBean(String response) {
+		GetNetMessageBean netMessageBean = JsonUtil.jsonToObject(response,
+				GetNetMessageBean.class);
+		if (netMessageBean.getResult() != null
+				&& !netMessageBean.getResult().isEmpty()) {
+			for (ResultBean resultBean : netMessageBean.getResult()) {
+				MessageItem messageItem = new MessageItem();
+				messageItem.setPhone(resultBean.getPhone());
+				messageItem.setDate(UserSession.getDataStrFromTimeMillis(
+						resultBean.getComdate(), "yyyy-MM-dd HH:mm:ss"));
+				ArrayList<String> childItems = new ArrayList<String>();
+				if (resultBean.getContents() != null
+						&& !resultBean.getContents().isEmpty())
+					for (ContentsBean contentsBean : resultBean.getContents()) {
+						childItems.add(contentsBean.getDate() + " "
+								+ contentsBean.getTag());
+					}
+				messageItem.setChildItems(childItems);
+				DBTool.getInstance()
+						.saveMessage(MainActivity.this, messageItem);
+			}
+		}
+		List<MessageItem> items = DBTool.getInstance().getSavedMessage(
+				getApplicationContext(), null,
+				// UserSession.getPhone(getApplicationContext())
+				null);
+		adapter.setData(items);
+		adapter.notifyDataSetChanged();
 	}
 
 }
