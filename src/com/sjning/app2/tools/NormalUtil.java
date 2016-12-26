@@ -96,9 +96,15 @@ public class NormalUtil {
 
 	public static long stringToLong(String strTime, String formatType)
 
-	throws ParseException {
+	{
 
-		Date date = stringToDate(strTime, formatType); // String类型转成date类型
+		Date date = null;
+		try {
+			date = stringToDate(strTime, formatType);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} // String类型转成date类型
 
 		if (date == null) {
 

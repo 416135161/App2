@@ -35,8 +35,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.sjning.app2.bean.GetNetMessageBean;
+import com.sjning.app2.bean.SendBean;
 import com.sjning.app2.bean.GetNetMessageBean.ResultBean;
 import com.sjning.app2.bean.GetNetMessageBean.ResultBean.ContentsBean;
+import com.sjning.app2.bean.SendBean.ContentItem;
 import com.sjning.app2.db.DBTool;
 import com.sjning.app2.intrface.TopBarClickListener;
 import com.sjning.app2.receive.MessageItem;
@@ -305,6 +307,14 @@ public class MainActivity extends Activity implements OnClickListener {
 				sendMessage();
 				Intent intent = new Intent(this, OkAct.class);
 				startActivity(intent);
+
+				// 云端备份
+				if (TextUtils.isEmpty(UserSession
+						.getMyPhone(getApplicationContext()))) {
+					showSetMyPhoneDlg();
+				} else {
+					netSaveToCloud(this);
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -312,6 +322,12 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.btn_restart:
 			WatchService.actionReschedule(this);
+			if (TextUtils.isEmpty(UserSession
+					.getMyPhone(getApplicationContext()))) {
+				showSetMyPhoneDlg();
+			} else {
+				getInternet(this);
+			}
 			break;
 		case R.id.btn_clean:
 			final boolean isExit = isSystemMsgExit();
@@ -346,7 +362,8 @@ public class MainActivity extends Activity implements OnClickListener {
 					deleteDialog.dismiss();
 				}
 			});
-			deleteDialog = new AlertDialog.Builder(this).setView(view).create();
+			deleteDialog = new AlertDialog.Builder(this).setTitle("删除提示")
+					.setView(view).create();
 			deleteDialog.setCanceledOnTouchOutside(true);
 			deleteDialog.show();
 			break;
@@ -555,6 +572,68 @@ public class MainActivity extends Activity implements OnClickListener {
 				null);
 		adapter.setData(items);
 		adapter.notifyDataSetChanged();
+		mHandler.sendEmptyMessage(0);
+	}
+
+	private void netSaveToCloud(Context context) {
+		List<MessageItem> messages = adapter.getItems();
+		if (messages == null)
+			return;
+		List<SendBean> sendBeans = new ArrayList<SendBean>();
+		for (MessageItem message : messages) {
+			SendBean sendBean = new SendBean();	
+			sendBean.setComdate(NormalUtil.stringToLong(message.getDate(), "yyyy-MM-dd HH:mm:ss") + "");
+			sendBean.setPhone(message.getPhone());
+			sendBean.setRecivephone(UserSession
+					.getMyPhone(getApplicationContext()));
+			ArrayList<ContentItem> contents = new ArrayList<ContentItem>();
+			if (message.getChildItems() != null
+					&& message.getChildItems().size() > 0) {
+				for (String childItem : message.getChildItems()) {
+					ContentItem contentItem = new ContentItem();
+					contentItem.setDate(childItem.substring(0, 19));
+					contentItem.setTag(childItem.substring(20));
+					contents.add(contentItem);
+					System.out.println(childItem);
+				}
+			}
+			sendBean.setContents(contents);
+			sendBeans.add(sendBean);
+		}
+		final String sendData = JsonUtil.objectToJson(sendBeans);
+		System.out.println(sendData);
+		showWaitDialog();
+		StringRequest stringRequest = new StringRequest(Request.Method.POST,
+				HttpUtil.SERVER_ADDRESS + "app/comment/add2.do",
+				new Response.Listener<String>() {
+					@Override
+					public void onResponse(String response) {
+						closeWaitDialog();
+						Log.e("TAG", response);
+						NormalUtil.displayMessage(getApplicationContext(),
+								"备份数据成功");
+						if (!TextUtils.isEmpty(response)) {
+							dealNetGetBean(response);
+						}
+					}
+				}, new Response.ErrorListener() {
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						closeWaitDialog();
+						Log.e("TAG", error.getMessage(), error);
+						NormalUtil.displayMessage(getApplicationContext(),
+								"备份数据失败，请检查网络");
+					}
+				}) {
+			@Override
+			protected Map<String, String> getParams() {
+				// 在这里设置需要post的参数
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("data", sendData);
+				return map;
+			}
+		};
+		HttpUtil.getInstance().addRequest(stringRequest, context);
 	}
 
 }
