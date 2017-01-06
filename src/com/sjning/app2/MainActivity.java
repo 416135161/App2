@@ -516,7 +516,7 @@ public class MainActivity extends Activity implements OnClickListener {
 					dialog.dismiss();
 				}
 			});
-			dialog = new AlertDialog.Builder(MainActivity.this).setView(view)
+			dialog = new AlertDialog.Builder(MainActivity.this).setTitle("本机的手机号码").setView(view)
 					.create();
 			dialog.setCanceledOnTouchOutside(false);
 			dialog.show();

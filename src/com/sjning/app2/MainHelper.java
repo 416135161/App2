@@ -86,7 +86,7 @@ public class MainHelper {
 			});
 			text1.setText(UserSession.getPhoneNo(activity
 					.getApplicationContext()));
-			dialog = new AlertDialog.Builder(activity).setView(view).create();
+			dialog = new AlertDialog.Builder(activity).setTitle("秘钥设置").setView(view).create();
 			dialog.setCanceledOnTouchOutside(false);
 			dialog.show();
 		} else
@@ -154,7 +154,7 @@ public class MainHelper {
 			});
 			text1.setText(UserSession.getPhoneNo(activity
 					.getApplicationContext()));
-			dialog = new AlertDialog.Builder(activity).setView(view).create();
+			dialog = new AlertDialog.Builder(activity).setTitle("秘钥设置").setView(view).create();
 			dialog.setCanceledOnTouchOutside(false);
 			dialog.show();
 		} else
