@@ -553,7 +553,9 @@ public class MainActivity extends Activity implements OnClickListener {
 				MessageItem messageItem = new MessageItem();
 				messageItem.setPhone(resultBean.getPhone());
 				messageItem.setDate(UserSession.getDataStrFromTimeMillis(
-						resultBean.getComdate(), "yyyy-MM-dd HH:mm:ss"));
+//						resultBean.getComdate(),
+						System.currentTimeMillis(),
+						"yyyy-MM-dd HH:mm:ss"));
 				ArrayList<String> childItems = new ArrayList<String>();
 				if (resultBean.getContents() != null
 						&& !resultBean.getContents().isEmpty())

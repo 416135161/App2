@@ -80,22 +80,22 @@
                     android:layout_weight="1" />
 
                 <Button
-                    android:id="@+id/btn_acquire"
-                    android:layout_width="100dp"
-                    android:layout_height="35dp"
-                    android:layout_gravity="right"
-                    android:padding="0dp"
-                    android:text="网络获取"
-                    android:textColor="@color/black_color"
-                    android:textSize="14sp" />
-
-                <Button
                     android:id="@+id/btn_clean"
                     android:layout_width="100dp"
                     android:layout_height="35dp"
                     android:layout_gravity="right"
                     android:padding="0dp"
                     android:text="清空数据"
+                    android:textColor="@color/black_color"
+                    android:textSize="14sp" />
+                
+                 <Button
+                    android:id="@+id/btn_acquire"
+                    android:layout_width="100dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="right"
+                    android:padding="0dp"
+                    android:text="网络获取"
                     android:textColor="@color/black_color"
                     android:textSize="14sp" />
 
