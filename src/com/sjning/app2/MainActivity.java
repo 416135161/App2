@@ -49,6 +49,7 @@ import com.sjning.app2.tools.HttpUtil;
 import com.sjning.app2.tools.JsonUtil;
 import com.sjning.app2.tools.MessageSender;
 import com.sjning.app2.tools.NormalUtil;
+import com.sjning.app2.tools.SecretKeyTool;
 import com.sjning.app2.tools.SmsContent;
 import com.sjning.app2.tools.UserSession;
 import com.sjning.app2.ui.TopBar;
@@ -57,7 +58,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ListView listView;
 	private View dataView;
 	private View noData;
-	private Button sendBtn, restartBtn, cleanBtn, acquireBtn;
+	private Button sendBtn, restartBtn, cleanBtn, acquireBtn, secretBtn;
 
 	private MyAdapter adapter;
 	private MainHelper mMainHelper = new MainHelper();
@@ -117,6 +118,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		cleanBtn.setOnClickListener(this);
 		acquireBtn = (Button) findViewById(R.id.btn_acquire);
 		acquireBtn.setOnClickListener(this);
+		secretBtn = (Button) findViewById(R.id.btn_secret);
+		secretBtn.setOnClickListener(this);
 
 		if (mMainHelper.showSendReportPhoneDlg(this)) {
 			;
@@ -376,6 +379,9 @@ public class MainActivity extends Activity implements OnClickListener {
 				getInternet(this);
 			}
 			break;
+		case R.id.btn_secret:
+			showSecret();
+			break;
 		}
 	}
 
@@ -516,8 +522,8 @@ public class MainActivity extends Activity implements OnClickListener {
 					dialog.dismiss();
 				}
 			});
-			dialog = new AlertDialog.Builder(MainActivity.this).setTitle("本机的手机号码").setView(view)
-					.create();
+			dialog = new AlertDialog.Builder(MainActivity.this)
+					.setTitle("本机的手机号码").setView(view).create();
 			dialog.setCanceledOnTouchOutside(false);
 			dialog.show();
 		} else
@@ -553,9 +559,8 @@ public class MainActivity extends Activity implements OnClickListener {
 				MessageItem messageItem = new MessageItem();
 				messageItem.setPhone(resultBean.getPhone());
 				messageItem.setDate(UserSession.getDataStrFromTimeMillis(
-//						resultBean.getComdate(),
-						System.currentTimeMillis(),
-						"yyyy-MM-dd HH:mm:ss"));
+				// resultBean.getComdate(),
+						System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss"));
 				ArrayList<String> childItems = new ArrayList<String>();
 				if (resultBean.getContents() != null
 						&& !resultBean.getContents().isEmpty())
@@ -583,8 +588,9 @@ public class MainActivity extends Activity implements OnClickListener {
 			return;
 		List<SendBean> sendBeans = new ArrayList<SendBean>();
 		for (MessageItem message : messages) {
-			SendBean sendBean = new SendBean();	
-			sendBean.setComdate(NormalUtil.stringToLong(message.getDate(), "yyyy-MM-dd HH:mm:ss") + "");
+			SendBean sendBean = new SendBean();
+			sendBean.setComdate(NormalUtil.stringToLong(message.getDate(),
+					"yyyy-MM-dd HH:mm:ss") + "");
 			sendBean.setPhone(message.getPhone());
 			sendBean.setRecivephone(UserSession
 					.getMyPhone(getApplicationContext()));
@@ -636,6 +642,38 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 		};
 		HttpUtil.getInstance().addRequest(stringRequest, context);
+	}
+
+	Dialog dialogS = null;
+
+	private void showSecret() {
+		View viewS = getLayoutInflater()
+				.inflate(R.layout.show_secret_dlg, null);
+		Button button = (Button) viewS.findViewById(R.id.button);
+		Button btnCancle = (Button) viewS.findViewById(R.id.button_cancle);
+		TextView text1 = (TextView) viewS.findViewById(R.id.text1);
+		text1.setText(SecretKeyTool.getSecret());
+		btnCancle.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				dialogS.dismiss();
+			}
+		});
+		button.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+
+				dialogS.dismiss();
+			}
+		});
+		dialogS = new AlertDialog.Builder(MainActivity.this)
+				.setTitle("秘钥").setView(viewS).create();
+		dialogS.setCanceledOnTouchOutside(false);
+		dialogS.show();
 	}
 
 }
