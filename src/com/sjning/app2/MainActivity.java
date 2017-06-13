@@ -58,7 +58,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ListView listView;
 	private View dataView;
 	private View noData;
-	private Button sendBtn, restartBtn, cleanBtn, acquireBtn, secretBtn;
+	private Button sendBtn, restartBtn, cleanBtn, acquireBtn, secretBtn, secretBtnNoData;
 
 	private MyAdapter adapter;
 	private MainHelper mMainHelper = new MainHelper();
@@ -112,6 +112,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		});
 		noData = findViewById(R.id.nodata);
+		secretBtnNoData = (Button) findViewById(R.id.btn_secret_no_data);
+		secretBtnNoData.setOnClickListener(this);
 		restartBtn = (Button) findViewById(R.id.btn_restart);
 		restartBtn.setOnClickListener(this);
 		cleanBtn = (Button) findViewById(R.id.btn_clean);
@@ -380,6 +382,9 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 			break;
 		case R.id.btn_secret:
+			showSecret();
+			break;
+		case R.id.btn_secret_no_data:
 			showSecret();
 			break;
 		}
@@ -671,7 +676,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 		});
 		dialogS = new AlertDialog.Builder(MainActivity.this)
-				.setTitle("秘钥").setView(viewS).create();
+				.setTitle("秘钥：授予管辖成员使用").setView(viewS).create();
 		dialogS.setCanceledOnTouchOutside(false);
 		dialogS.show();
 	}

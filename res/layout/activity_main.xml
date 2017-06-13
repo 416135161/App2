@@ -85,7 +85,7 @@
                     android:layout_height="35dp"
                     android:layout_gravity="right"
                     android:padding="0dp"
-                    android:text="获取秘钥"
+                    android:text="授权秘钥"
                     android:textColor="@color/black_color"
                     android:textSize="14sp" />
 
@@ -125,33 +125,54 @@
             android:id="@+id/nodata"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="15dp"
+           
             android:orientation="vertical"
             android:visibility="invisible" >
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="wrap_content" 
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Tips：如短信里接收到了数据，仍无报告内容显示，请重启软件："
-                android:textColor="@color/black_color" />
-
-            <Button
-                android:id="@+id/btn_restart"
-                android:layout_width="120dp"
-                android:layout_height="35dp"
-                android:layout_marginTop="15dp"
-                android:text="重获数据"
+                android:text="Tips:\n如在发送接收操作后，此界面仍无数据内容显示，请点击底部按钮“重获数据”以刷新！"
                 android:textColor="@color/black_color"
-                android:textSize="14sp" />
+                android:layout_marginTop="15dp"
+           	 	android:paddingLeft="15dp"
+            	android:paddingRight="15dp"
+               />
 
             <TextView
                 style="@style/text_nodata_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:text="暂无报告内容"
                 android:textColor="@color/black_color" />
+              <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey_color" />
+            <LinearLayout  android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_gravity="bottom"
+                android:orientation="horizontal"  >
+                <Button
+                    android:id="@+id/btn_secret_no_data"
+                    android:layout_width="80dp"
+                    android:layout_height="35dp"
+                    android:text="授权秘钥"
+                    android:textColor="@color/black_color"
+                    android:textSize="14sp" />
+             	<Button
+                	android:id="@+id/btn_restart"
+                	android:layout_width="80dp"
+                	android:layout_height="35dp"
+               	 	android:text="重获数据"
+               	 	android:textColor="@color/black_color"
+                	android:textSize="14sp" />
+              
+           </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 
