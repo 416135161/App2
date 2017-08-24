@@ -671,7 +671,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 		});
 		dialogS = new AlertDialog.Builder(MainActivity.this)
-				.setTitle("秘钥").setView(viewS).create();
+				.setTitle("秘钥：授于管辖成员使用").setView(viewS).create();
 		dialogS.setCanceledOnTouchOutside(false);
 		dialogS.show();
 	}
